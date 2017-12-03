@@ -34,14 +34,14 @@ class BookListViewController: UIViewController {
             let indexPath = tableView.indexPathForSelectedRow!
             let book = books[indexPath.row]
             let destinationController = segue.destination as! UINavigationController
-            let destination = destinationController.viewControllers[0] as! EditBookTableViewController
+            let destination = destinationController.viewControllers[0] as! BookDetailViewController
             destination.book = book
         }
     }
     
     @IBAction func unwindToBookList(segue: UIStoryboardSegue) {
         guard segue.identifier == "saveUnwind" else { return }
-        let sourceViewController = segue.source as! EditBookTableViewController
+        let sourceViewController = segue.source as! BookDetailViewController
         
         if let book = sourceViewController.book {
             if let selectedIndexPath = tableView.indexPathForSelectedRow {

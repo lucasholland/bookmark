@@ -8,7 +8,7 @@
 
 import UIKit
 
-class EditBookTableViewController: UITableViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+class BookDetailViewController: UITableViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 
     @IBOutlet weak var titleTextField: UITextField!
     @IBOutlet weak var authorTextField: UITextField!
