@@ -27,6 +27,7 @@ class Book: NSObject, NSCoding {
     }
     //MARK: NSCoding
     required convenience init?(coder aDecoder: NSCoder) {
+        os_log("Attempting to decode book object", log: OSLog.default, type: .debug)
         guard let title = aDecoder.decodeObject(forKey: PropertyKeys.title) as? String else {
             os_log("Unable to decode book title", log: OSLog.default, type: .debug)
             return nil
@@ -39,14 +40,9 @@ class Book: NSObject, NSCoding {
             os_log("Unable to decode book cover", log: OSLog.default, type: .debug)
             return nil
         }
-        guard let pages = aDecoder.decodeObject(forKey: PropertyKeys.pages) as? Int else {
-            os_log("Unable to decode number of pages in book", log: OSLog.default, type: .debug)
-            return nil
-        }
-        guard let currentPage = aDecoder.decodeObject(forKey: PropertyKeys.currentPage) as? Int else {
-            os_log("Unable to decode current page number", log: OSLog.default, type: .debug)
-            return nil
-        }
+         let pages = aDecoder.decodeInteger(forKey: PropertyKeys.pages)
+
+        let currentPage = aDecoder.decodeInteger(forKey: PropertyKeys.currentPage) 
         self.init(title: title, author: author, pages: pages, currentPage: currentPage, cover: cover)
     }
     func encode(with aCoder: NSCoder) {

@@ -12,15 +12,17 @@ class BookListViewController: UIViewController {
     
     @IBOutlet weak var tableView: UITableView!
     
+    @IBOutlet weak var editButton: UIBarButtonItem!
     var books: [Book] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
+
      //   books = createArray()
         
         tableView.delegate = self
         tableView.dataSource = self
-        
+
         if let savedBooks = loadBooks() {
             books += savedBooks
         
@@ -28,13 +30,24 @@ class BookListViewController: UIViewController {
             books = createArray()
         }
     }
+    
+    @IBAction func editButtonTapped(_ sender: UIBarButtonItem) {
+        tableView.setEditing(!tableView.isEditing, animated: true)
+        if tableView.isEditing {
+            editButton.title = "Done"
+        } else {
+            editButton.title = "Edit"
+        }
+    }
+    
+    
     //MARK: Segues
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "EditBook" {
             let indexPath = tableView.indexPathForSelectedRow!
             let book = books[indexPath.row]
-            let destinationController = segue.destination as! UINavigationController
-            let destination = destinationController.viewControllers[0] as! BookDetailViewController
+            // let destinationController = segue.destination as! UINavigationController
+            let destination = segue.destination as! BookDetailViewController //destinationController.viewControllers[0] as! BookDetailViewController
             destination.book = book
         }
     }
@@ -59,6 +72,7 @@ class BookListViewController: UIViewController {
     }
     //MARK: Loading & Saving Data
     private func saveBooks() {
+        os_log("Attempting to save books", log: OSLog.default, type: .debug)
         let isSuccessfulSave = NSKeyedArchiver.archiveRootObject(books, toFile: Book.ArchiveURL.path)
         if isSuccessfulSave {
             os_log("Books successfully saved", log: OSLog.default, type: .debug)
@@ -68,6 +82,7 @@ class BookListViewController: UIViewController {
     }
     
     private func loadBooks() -> [Book]? {
+        os_log("Attempting to load books", log: OSLog.default, type: .debug)
         return NSKeyedUnarchiver.unarchiveObject(withFile: Book.ArchiveURL.path) as? [Book]
     }
     
@@ -96,8 +111,30 @@ extension BookListViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCellEditingStyle {
-        return .delete
+        return .delete //.delete
     }
+    
+     func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+        let movedObject = self.books[sourceIndexPath.row]
+        books.remove(at: sourceIndexPath.row)
+        books.insert(movedObject, at: destinationIndexPath.row)
+        NSLog("%@", "\(sourceIndexPath.row) => \(destinationIndexPath.row) \(books)")
+        tableView.reloadData()
+        saveBooks()
+    }
+    
+    
+    
+
+    
+     func tableView(_ tableView: UITableView, shouldIndentWhileEditingRowAt indexPath: IndexPath) -> Bool {
+        return false
+    }
+    
+    
+    
+    
+    
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             books.remove(at: indexPath.row)
